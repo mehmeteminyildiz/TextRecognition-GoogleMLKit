@@ -14,9 +14,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.github.dhaval2404.imagepicker.ImagePicker
-import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -89,15 +87,41 @@ class HomeFragment : Fragment() {
     private fun recognizeText(uri: Uri) {
         try {
             val inputImage = InputImage.fromFilePath(requireContext(), uri)
-            val result: Task<Text> = textRecognizer.process(inputImage).addOnSuccessListener { text ->
+            val result = textRecognizer.process(inputImage).addOnSuccessListener { text ->
                 Log.e("TAG", "text : $text")
                 val recognizedText = text.text
                 binding.tvResult.text = recognizedText
+
+                for (block in text.textBlocks) {
+                    val blockText = block.text
+                    val blockCornerPoints = block.cornerPoints
+                    val blockFrame = block.boundingBox
+                    Log.e("XXX 1", "blockText: $blockText")
+                    Log.e("XXX 1", "blockCornerPoints: $blockCornerPoints")
+                    Log.e("XXX 1", "blockFrame: $blockFrame")
+
+                    for (line in block.lines) {
+                        val lineText = line.text
+                        val lineCornerPoints = line.cornerPoints
+                        val lineFrame = line.boundingBox
+                        Log.e("XXX 2", "lineText: $lineText")
+                        Log.e("XXX 2", "lineCornerPoints: $lineCornerPoints")
+                        Log.e("XXX 2", "lineFrame: $lineFrame")
+
+                        for (element in line.elements) {
+                            val elementText = element.text
+                            val elementCornerPoints = element.cornerPoints
+                            val elementFrame = element.boundingBox
+                            Log.e("XXX 3", "elementText: $elementText")
+                            Log.e("XXX 3", "elementCornerPoints: $elementCornerPoints")
+                            Log.e("XXX 3", "elementFrame: $elementFrame")
+                        }
+                    }
+                }
             }.addOnFailureListener { e ->
                 e.printStackTrace()
                 Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
             }
-
         } catch (e: IOException) {
             e.printStackTrace()
         }
